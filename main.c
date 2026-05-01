@@ -4,8 +4,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "amdgpu.h"
+#include <amdgpu.h>
 
 int main() {
     printf("test");
+    int fat = 0;
+    return 0;
 }

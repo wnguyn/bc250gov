@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "toml.h"
+#include "amdgpu.h"
 
 int main() {
-    println("test");
+    printf("test");
 }

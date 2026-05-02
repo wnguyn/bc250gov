@@ -18,9 +18,8 @@ typedef struct {
 
 
 typedef struct {
-    bool use_flock;
     char path[256];
-    File *p;
+    FILE *p;
 } bc_pci;
 
 bc_gpu bc_gpu_new();
@@ -32,5 +31,7 @@ void bc_gpu_updt(bc_gpu *g);
 
 
 bc_pci pci_new_open();
-void pci_write();
-void pci_read();
+void pci_write(bc_pci *p);
+void pci_readcfg(bc_pci *p);
+void pci_readsmu(bc_pci *p, );
+void pci_writesmu(bc_pci *p, int value);

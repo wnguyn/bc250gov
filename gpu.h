@@ -21,9 +21,11 @@ typedef struct {
 bc_gpu bc_gpu_new();
 void get_poll(bc_gpu *g);
 void get_temp(bc_gpu *g);
+void scale_temp(bc_gpu *g, int scl)
+int get_max_freq(bc_gpu *g);
 
 
-bc_pci bc_pci_new();
-int bc_pci_open();
-void bc_pci_write();
-void bc_pci_read();
+bc_pci pci_new();
+int pci_open(pci *g);
+void pci_write();
+void pci_read();

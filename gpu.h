@@ -23,7 +23,7 @@ typedef struct {
 } bc_pci;
 
 bc_gpu bc_gpu_new();
-void get_poll(bc_gpu *g);
+int get_poll(bc_gpu *g);
 void get_temp(bc_gpu *g);
 void scale_temp(bc_gpu *g, int scl);
 int get_max_freq(bc_gpu *g);
@@ -34,5 +34,3 @@ bc_pci pci_new_open();
 int pci_readcfg(bc_pci *p, int oft, int cfg);
 void pci_readsmu(bc_pci *p, int n );
 void pci_writesmu(bc_pci *p, int value);
-
-bc_smu bc_smu_new();

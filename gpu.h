@@ -23,6 +23,7 @@ void get_poll(bc_gpu *g);
 void get_temp(bc_gpu *g);
 void scale_temp(bc_gpu *g, int scl)
 int get_max_freq(bc_gpu *g);
+void bc_gpu_updt(bc_gpu *g);
 
 
 bc_pci pci_new();

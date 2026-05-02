@@ -1,19 +1,19 @@
-#include <libdrm/amdgpu.h>
-#include <libdrm/amdgpu_drm.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdint.h>
+#include <unistd.h>
 
 #include "toml.h"
 #include "gpu.h"
+
 typedef struct {
     int safepts[8];
     int interval;
     float threshd;
-    int throttling_tmp;
-    int recvry_tmp;
+    float threshd_down;
+    int throttling_temp;
+    int recovery_temp;
     int step;
+    int burst;
 } Config;
 
 typedef enum {
@@ -22,69 +22,94 @@ typedef enum {
     GOV_DOWN
 } GovState;
 
-int target_freq(GovState *g, bc_gpu *gpu) {
-
-}
-
-/* Change the cfg DWM Style */
 #define CHANGE 500
-Config config_new() {
-    printf("setting config");
-    return (Config) {
-        .safepts[8] = {
-            {350,  700, 1},
-            {1000, 800, 2},
-            {1175, 850, 3},
-            {1600, 910, 3},
-            {1850, 930, 3},
-            {2050, 980, 3},
-            {2125, 1020, 3},
-            {2200, 1050, 3},
+
+static int target_freq(GovState state, const bc_gpu *gpu, const Config *cfg)
+{
+    if (gpu == NULL || cfg == NULL) {
+        return 0;
+    }
+
+    switch (state) {
+    case GOV_UP:
+        if (gpu->freq + cfg->step > gpu->max_freq) {
+            return gpu->max_freq;
         }
-        .step = 50;
-        .recvry_temp = 70;
-        .throttling_tmp = 85;
-        .threshd = 50.0;
-        .burst = 500; /* burst freq if you need sharp perf */
-    };
+        return gpu->freq + cfg->step;
+    case GOV_DOWN:
+        if (gpu->freq - CHANGE < gpu->min_freq) {
+            return gpu->min_freq;
+        }
+        return gpu->freq - CHANGE;
+    case GOV_IDLE:
+    default:
+        return gpu->freq;
+    }
 }
 
-int main() {
-    printf("starting...");
+static Config config_new(void)
+{
+    Config cfg = {
+        .safepts = {350, 1000, 1175, 1600, 1850, 2050, 2125, 2200},
+        .interval = 1,
+        .threshd = 50.0f,
+        .threshd_down = 25.0f,
+        .throttling_temp = 85,
+        .recovery_temp = 70,
+        .step = 50,
+        .burst = 500,
+    };
+
+    return cfg;
+}
+
+int main(void)
+{
     bc_gpu gpu = bc_gpu_new();
     Config cfg = config_new();
-    int current_freq = gpu.freq;
-    int status = 0;
-    GOV_STATE pwr_state = GOV_IDLE;
+    GovState pwr_state = GOV_IDLE;
+
+    printf("starting...\n");
+
     while (true) {
-        int temp = get_temp();
-        switch (temp) {
-            case (temp > gpu) && (gpu.max_freq >= gpu.min_freq + step):
-                gpu.max_freq -= CHANGE;
-                printf("throttling temp becaue of high temp");
-            case (cfg.recvy_temp > gpu.temp) && gpu.max_freq != gpu.max_freq:
-                gpu.max_freq += scale_temp(*gpu, gpu.step);
-                printf("scaling back up b/c it's at a low temp");
+        int temp = get_temp(&gpu);
+        int sum = 0;
+        int avg_load;
+        int target;
+
+        if (temp > cfg.throttling_temp &&
+            gpu.max_freq >= gpu.min_freq + cfg.step) {
+            gpu.max_freq -= CHANGE;
+            printf("throttling temp because of high temp\n");
+        } else if (cfg.recovery_temp > gpu.temp &&
+                   gpu.max_freq != get_max_freq(&gpu)) {
+            gpu.max_freq += scale_temp(&gpu, gpu.step);
+            printf("scaling back up because it's at a low temp\n");
         }
-        float load = 0.0;
-        for (int i = 0; i < 128; i++) {
-            int sum += get_pool(*gpu);
+
+        for (int i = 0; i < gpu.samples; i++) {
+            sum += get_poll(&gpu);
         }
-        int avg_load = sum / 128;
+
+        avg_load = sum / gpu.samples;
+
         if (avg_load > cfg.threshd) {
             pwr_state = GOV_UP;
-        } else if (avg_load < cfg.threshd_down && current_freq > gpu.min_freq)  {
+        } else if (avg_load < cfg.threshd_down &&
+                   gpu.freq > gpu.min_freq) {
             pwr_state = GOV_DOWN;
         } else {
-            pwr_state GOV_IDLE;
+            pwr_state = GOV_IDLE;
         }
-        int target = target_freq(*pwr_state, *gpu);
+
+        target = target_freq(pwr_state, &gpu, &cfg);
         if (gpu.freq != target) {
-            printf("clocking up due to idle....");
-            bc_gpu_updt(*g);
+            printf("updating frequency\n");
+            bc_gpu_updt(&gpu);
             gpu.freq = target;
         }
-        sleep(cfg.interval);
-        bc_gpu_updt(*g );
+
+        sleep((unsigned)cfg.interval);
+        bc_gpu_updt(&gpu);
     }
 }

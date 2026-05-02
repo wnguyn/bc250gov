@@ -10,7 +10,6 @@ bc_pci new() {
     return pci;
 }
 
-
 int pci_readcfg(bc_pci *pci, int pad) {
     uint8_t buf[4] = {0};
     int new = dup(pci->p);
@@ -24,5 +23,26 @@ int pci_readcfg(bc_pci *pci, int pad) {
 } // return offset;
 void pc_writecfg(bc_pci *pci, int oft, int cfg) {
     uint8_t buf[4] = {0};
-    pwrite(fd, buf, 4, offset);
+    pwrite(buf, cfg, 4, oft);
+}
+
+void pc_readsmu(bc_pci *pci, int n ) {
+    pc_writecfg(pci, 0xB8);
+    return pc_readcfg(0xBC);
+
+}
+void pc_writesmu(bc_pci *pci, int reg, int val) {
+    pc_writecfg(pci, 0xB8, reg);
+    pc_writecfg(pci, 0xBC, val);
+}
+
+
+
+bc_gpu new() {
+    drmPciBusInfo location = {
+        .domain = 0,
+        .bus    = 1,
+        .dev    = 0,
+        .func   = 0,
+    }a;
 }

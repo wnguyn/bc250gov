@@ -31,7 +31,8 @@ void bc_gpu_updt(bc_gpu *g);
 
 
 bc_pci pci_new_open();
-void pci_write(bc_pci *p);
-void pci_readcfg(bc_pci *p);
-void pci_readsmu(bc_pci *p, );
+int pci_readcfg(bc_pci *p, int oft, int cfg);
+void pci_readsmu(bc_pci *p, int n );
 void pci_writesmu(bc_pci *p, int value);
+
+bc_smu bc_smu_new();

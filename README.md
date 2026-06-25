@@ -1,2 +1,2 @@
 ## WHAT IS THIS??
-I NEED TO WRITE THIS LATER!!
+WIP: rewriting to cpp + adding better SMU LOGIC

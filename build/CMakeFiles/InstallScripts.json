@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/will/git/cpp/bc250gov/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

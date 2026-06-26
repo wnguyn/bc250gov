@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(bc250gov
-    main.cpp
     src/main.cpp
+    src/config.cpp
     src/idle/loop.hpp
     src/idle/policy.hpp
     src/idle/sensor.hpp
@@ -19,3 +19,7 @@ add_executable(bc250gov
 )
 
 target_include_directories(bc250gov PRIVATE src)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML_CPP REQUIRED IMPORTED_TARGET yaml-cpp)
+target_link_libraries(bc250gov PRIVATE PkgConfig::YAML_CPP)

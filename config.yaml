@@ -1,0 +1,11 @@
+# bc250gov configuration
+# All fields optional; defaults are used when missing.
+
+safepts: [350, 1000, 1175, 1600, 1850, 2050, 2125, 2200]
+interval: 1
+threshd: 50.0
+threshd_down: 25.0
+throttling_temp: 85
+recovery_temp: 70
+step: 50
+burst: 500

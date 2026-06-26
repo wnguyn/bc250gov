@@ -31,7 +31,8 @@ int main(void) {
     std::cout << "you aren't running this on a bc-250";
     return 1;
   }
-  Config config = Config::defaults();
+  Config config = Config();
+
 
 
 

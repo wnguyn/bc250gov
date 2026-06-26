@@ -1,3 +1,0 @@
-/home/will/git/cpp/bc250gov/build/CMakeFiles/bc250gov.dir
-/home/will/git/cpp/bc250gov/build/CMakeFiles/edit_cache.dir
-/home/will/git/cpp/bc250gov/build/CMakeFiles/rebuild_cache.dir

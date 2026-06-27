@@ -42,3 +42,13 @@ void CyanTransport::write_config32(uint64_t offset, uint32_t val) {
     this->file.seekp(offset, std::ios::beg);
     this->file.write(reinterpret_cast<char*>(buf), 4);
 }
+uint32_t CyanTransport::read_smu(uint32_t reg) {
+  CyanTransport::write_config32(0xB8, reg);
+  auto var = CyanTransport::read_config32(0xBC);
+  return var;
+}
+
+void CyanTransport::write_smu(uint32_t ofst, uint32_t reg) {
+  CyanTransport::write_config32(0xB8, reg);
+  CyanTransport::write_config32(0xB8, reg);
+}

@@ -23,8 +23,7 @@ class CyanBox {
     uint32_t timeout;
     CyanTransport transprt;
 
-    CyanBox(CyanTransport trans, uint32_t cmd_addr, uint32_t rsp_addr, uint32_t arg_addr, uint32_t timeout);
-    ~CyanBox();
+    CyanBox(std::string pci_id, uint32_t cmd_addr, uint32_t rsp_addr, uint32_t arg_addr, uint32_t timeout);
     bool send(uint32_t msg_id, uint32_t arg, uint32_t arg_2);
     uint32_t read();
     uint32_t read_hi();

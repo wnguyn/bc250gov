@@ -4,9 +4,9 @@ pkgs.mkShell {
     pkgs.gcc
     pkgs.gnumake
     pkgs.pkg-config
-    pkgs.libdrm
+    pkgs.libdrm.dev
     pkgs.yaml-cpp
   ];
 
-  PKG_CONFIG_PATH = "${pkgs.libdrm}/lib/pkgconfig";
+
 }

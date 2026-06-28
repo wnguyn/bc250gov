@@ -21,5 +21,7 @@ add_executable(bc250gov
 target_include_directories(bc250gov PRIVATE src)
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBDRM REQUIRED IMPORTED_TARGET libdrm)
 pkg_check_modules(YAML_CPP REQUIRED IMPORTED_TARGET yaml-cpp)
 target_link_libraries(bc250gov PRIVATE PkgConfig::YAML_CPP)
+target_link_libraries(bc250gov PRIVATE PkgConfig::LIBDRM)

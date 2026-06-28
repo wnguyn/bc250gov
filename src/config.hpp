@@ -1,6 +1,6 @@
 #include <vector>
 #include <tuple>
-
+#include <cstdint>
 
 
 enum Profile {
@@ -12,14 +12,14 @@ enum Profile {
 
 
 struct Time {
-  int interval;
-  int freq_check; // check the rate we check to lower freq (in seconds)
-  int ramp_rate; // scalar quantity of the ramp rate [1,3]
-  int idle_thresh; // how many cpu events that we qualify as "active"
+  uint32_t interval;
+  uint32_t freq_check; // check the rate we check to lower freq (in seconds)
+  uint32_t ramp_rate; // scalar quantity of the ramp rate [1,3]
+  uint32_t idle_thresh; // how many cpu events that we qualify as "active"
 };
 struct SafePt {
-  int freq;
-  int volt;
+  uint16_t freq;
+  float volt;
   Profile prof;
 };
 
@@ -35,7 +35,7 @@ class Config {
   private:
     std::vector<SafePt> get_safe_pts();
     Time load_default_timing();
-    std::tuple<int, int> load_default_target();
+    std::tuple<uint32_t, uint32_t> load_default_target();
     
 
     

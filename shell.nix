@@ -6,6 +6,7 @@ pkgs.mkShell {
     pkgs.pkg-config
     pkgs.libdrm.dev
     pkgs.yaml-cpp
+    pkgs.libgbm
   ];
 
 

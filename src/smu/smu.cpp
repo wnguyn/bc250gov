@@ -1,5 +1,6 @@
 #include "smu.hpp"
 #include "cmd.hpp"
+#include <amdgpu.h>
 #include <gbm.h>
 #include <fstream>
 #include <iostream>
@@ -35,11 +36,26 @@ APU::APU(std::vector<SafePt> pts) {
     if (temp < lo)
       lo = temp;
   }
-  auto smu = Smu(true, std::move(buf), 30);  // allocate buf[128]
-  std::cout << "connection started????\n";
+  std::tuple<int,int> tuple(lo, hi);
 
-    
-  
+
+
+  auto smu = Smu(true, std::move(buf), 30);  
+  auto temp = 60; 
+  std::cout << "connection started???? waow\n";
+  smu.check_test_msg();
+  smu.set_gpu_max_temp(std::move(temp)); 
+  smu.unforce_gfx_freq();
+  smu.unforce_gfx_vid();
+
+
+  amdgpu_device_handle dev_skibidi;
+
+  this->dev = std::move(dev_skibidi);
+  this->sample = 0;
+  this->freq = tuple;
+  this->safe_pts = pts;
+
 };
 
 APU::~APU() {

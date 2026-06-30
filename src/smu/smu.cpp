@@ -2,6 +2,7 @@
 #include "cmd.hpp"
 #include <gbm.h>
 #include <fstream>
+#include <iostream>
 
 Path APU::get_sysfs_path(drmPciBusInfo *pci, char *buf, size_t len) {                             
   int n = std::snprintf(buf, len,                                                                    
@@ -20,13 +21,13 @@ APU::APU(std::vector<SafePt> pts) {
     .func = 0,
   };
   char buf[128];
+
   Path sysfs_path = APU::get_sysfs_path(&location, buf, sizeof(buf));
   Path drm_path = Path("/dev/dri/renderD128");
 
   file_thing.open(drm_path);
   int hi = 0; int lo = 0;
-
-  // probably could iterate better
+  // probably could iterate functionally instead of imperative
   for (int i = 0; i < pts.size(); i++) {
     int temp = pts[i].freq;
     if (temp > hi) 
@@ -34,5 +35,14 @@ APU::APU(std::vector<SafePt> pts) {
     if (temp < lo)
       lo = temp;
   }
+  auto smu = Smu(true, std::move(buf), 30);  // allocate buf[128]
+  std::cout << "connection started????\n";
 
+    
+  
 };
+
+APU::~APU() {
+  // delete dev;
+};
+

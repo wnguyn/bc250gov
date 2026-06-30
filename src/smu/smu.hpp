@@ -1,17 +1,27 @@
-// Tradtional clocking without interacting with the SMU library
+// Tradtional clocking without interacting with the SMU library, basically amdgpu
 
 #include <cstdint>
 #include <tuple>
 #include <vector>
-
+#import <iostream>
 #include <filesystem>
 #include <amdgpu_drm.h>   
 #include <xf86drm.h>
 #include <amdgpu.h>
 #include <gbm.h>
+#import "cmd.hpp"
 #include "config.hpp"
 
 using Path = std::filesystem::path;
+
+const uint32_t GRBM_STATUS_REG = 0x2004;
+const uint32_t GPU_ACTIVE_BIT = 31;
+
+
+
+
+
+
 
 
 class DrmDevice;

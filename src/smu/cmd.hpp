@@ -40,7 +40,7 @@ class Smu {
         uint32_t arg_high,
         uint8_t pack,
         uint8_t decode
-
+    );
     // tons of smu functions to actually do stuff
     uint32_t get_smu_version();
     uint32_t get_driver_version();

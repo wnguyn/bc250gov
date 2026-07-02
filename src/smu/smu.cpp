@@ -37,7 +37,7 @@ APU::APU(std::vector<SafePt> pts) : smu(true, "0000:00:00.0", 67) {
       lo = temp;
   }
   std::tuple<int,int> tuple(lo, hi);
-  this->smu.set_gpu_max_temp(60);
+  this->smu.set_gpu_max_temp(60); // aggressive asf, need to check peformance on heckin' games!!!
   this->smu.unforce_gfx_freq();
   this->smu.unforce_gfx_vid();
   amdgpu_device_handle dev_skibidi;

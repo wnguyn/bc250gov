@@ -1,33 +1,22 @@
-#import "policy.hpp"
+#include "policy.hpp"
 
+void smu_init_idle(APU& gpu) {
+  Smu& s = gpu.smu;
 
-uint32_t Idle::get_enabled_smu(APU * gpu) {
+  uint32_t safe = (1u << 17) | (1u << 19) | (1u << 7)
+                | (1u << 8)  | (1u << 9)  | (1u << 14);
 
+  uint32_t before = s.get_enabled_smu();
+  s.q3_enable_smu_features(before | safe);
 
-
-};
-
-
-void Idle::smu_init_idle(APU* gpu) {
-  // enable safe-ish (wow) idles 
-  uint32_t safe = (1u << 17) | (1u << 19) | (1u << 7) | (1u << 8) | (1u << 9) | (1u << 14); // fancy version of 0x000A4380 
-  uint32_t before = Idle::get_enabled_smu(gpu);
-  gpu->smu.q3_enable_smu_features();
-  std::cout << "told smu value: " << safe << "and enabled?? \n";
-  gpu->smu.set_min_gfxclk(0);
-  gpu->smu.set_max_deep_sleep(0xFF);
-  gpu->smu.q3_set_perf_profile_index(0);
-  gpu->smu.q3_set_soc_clock(0);
-  gpu->smu.q3_vid_main_limit(800);
-  gpu->smu.unforce_gfx_freq();
-  gpu->smu.unforce_gfx_vid();
-
-  for(int i = 0; i < 7; i++) 
-    gpu->smu.set_soft_minclck();
-  std::cout << "done...";
-
-
-
+  s.set_min_gfxclk(0);
+  s.set_max_deep_sleep(0xFF);
+  s.q3_set_perf_profile_index(0);
+  s.q3_set_soc_clock(0);
+  s.q3_vid_main_limit(800);
+  for (uint8_t c = 0; c < 6; c++) {
+    s.set_soft_minclck(c, 0);
+    s.set_soft_maxclck(c, 1200);
+  }
+  s.unforce_gfx_freq();
 }
-
-

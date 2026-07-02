@@ -1,5 +1,6 @@
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <stdint.h>
 // need later
 
@@ -16,12 +17,13 @@ namespace Codec {
 
   }
   uint32_t pack_float32(float var) {
-    uint32_t typecast = var;
-    return var;
+    uint32_t out;
+    std::memcpy(&out, &var, 4);
+    return out;
   }
-  uint32_t mv_vid(uint32_t var) {
-    uint32_t volts = ((float) (uint32_t)) / 1000.0;
-    return volts;
+  uint32_t mv_vid(uint32_t mv) {
+    double volts = (double)mv / 1000.0;
+    return (uint32_t)std::round((1.55 - volts) / 0.00625);
   }
 
 

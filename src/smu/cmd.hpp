@@ -3,9 +3,8 @@
 
 #import "config.hpp"
 
-#include <queue>
-#import <cstdint>
 #include <array>
+#import <cstdint>
 #import "transport.hpp"
 #import "status.hpp"
 
@@ -27,7 +26,7 @@ constexpr std::array<QueueAddr, 5> DEFAULT_QUEUE_ADDRS = {{
 class Smu {
   public:
     CyanTransport trans;
-    std::queue<CyanBox> queue;
+    std::array<CyanBox, 5> queues;
 
     Smu(bool queue, std::string buf, uint16_t timeout);
     ~Smu();
@@ -55,16 +54,16 @@ class Smu {
     uint32_t hi_s3_pwroff(uint32_t var);
     uint32_t lo_s3_pwroff(uint32_t var);
     void req_wgp();
-    void set_min_gfxclk();
-    void set_max_deep_sleep();
+    void set_min_gfxclk(uint32_t mhz);
+    void set_max_deep_sleep(uint32_t div);
     void start_telem();
     void clear_telem();
     uint32_t find_active_wgp();
     uint32_t get_gfx_fq();
     uint32_t get_gfx_vid();
-    uint32_t force_gfx_frq();
+    uint32_t force_gfx_freq(uint32_t mhz);
     uint32_t unforce_gfx_freq();
-    uint32_t force_gfx_vid();
+    uint32_t force_gfx_vid(uint32_t mv);
     uint32_t unforce_gfx_vid();
     uint32_t get_enabled_smu();
     uint32_t set_core_enable();
@@ -72,8 +71,16 @@ class Smu {
     uint32_t l3_cac();
     uint32_t pac_core();
     void driver_taple();
-    uint32_t set_soft_minclck();
+    uint32_t set_soft_minclck(uint8_t core, uint16_t mhz);
+    uint32_t set_soft_maxclck(uint8_t core, uint16_t mhz);
     uint32_t set_hard_minclock();
+
+    uint32_t q3_set_perf_profile_index(uint32_t idx);
+    uint32_t q3_enable_smu_features(uint32_t mask);
+    uint32_t q3_set_soc_clock(uint32_t level);
+    uint32_t q3_vid_main_limit(uint32_t mv);
+    uint32_t q3_disable_smu_features(uint32_t mask);
+    uint32_t set_gpu_max_temp(uint32_t c);
 
     uint32_t q1_msg_0x08();
     uint32_t q1_msg_0x10();

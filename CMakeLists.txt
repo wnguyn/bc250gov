@@ -10,6 +10,7 @@ add_executable(bc250gov
     src/config.cpp
     src/idle/loop.hpp
     src/idle/policy.hpp
+    src/idle/policy.cpp
     src/idle/sensor.hpp
     src/idle/state.hpp
     src/smu/cmd.hpp

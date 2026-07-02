@@ -3,41 +3,39 @@
 // #include <tuple>
 
 
-CyanBox::CyanBox(std::string pci_id, uint32_t cmd_addr, uint32_t rsp_addr, uint32_t arg_addr, uint32_t timeout): transprt(pci_id) {
+CyanBox::CyanBox() : addr_cmd(0), rsp_cmd(0), arg_addr(0), timeout(0), trans(nullptr) {}
+CyanBox::CyanBox(CyanTransport* t, uint32_t cmd_addr, uint32_t rsp_addr, uint32_t arg_addr, uint32_t timeout)
+    : trans(t) {
   this->addr_cmd = cmd_addr;
   this->rsp_cmd  = rsp_addr;
   this->arg_addr = arg_addr;
   this->timeout  = timeout;
 }
 bool CyanBox::send(uint32_t msg_id, uint32_t arg, uint32_t arg_2) {
-  this->transprt.write_config32(this->rsp_cmd, 0);
-  this->transprt.write_config32(this->arg_addr, arg);
-  this->transprt.write_config32(this->arg_addr + 4, this->arg_addr);
-  this->transprt.write_config32(this->addr_cmd, msg_id);
-
-  uint32_t tme = timeout;
-  auto addr = rsp_cmd;
-  /* implement later
-  while (tme > 0) {
-    tme--;
-    auto stat = this->transprt.read_config32(addr);
-
-  }
-  */
-  
+  trans->write_smu(rsp_cmd, 0);
+  trans->write_smu(arg_addr, arg);
+  trans->write_smu(arg_addr + 4, arg_2);
+  trans->write_smu(addr_cmd, msg_id);
   return true;
+}
+
+SmuStatus CyanBox::wdone() {
+  for (uint32_t i = 0; i < timeout; i++) {
+    uint32_t raw = trans->read_smu(rsp_cmd);
+    if (raw == 0xFF) return SmuStatus::Failed;
+    if (raw == 0xFE) return SmuStatus::UnknownCmd;
+    if (raw == 0xFD) return SmuStatus::RejectedPrereq;
+  }
+  return SmuStatus::Failed;
 }
 
 
 uint32_t CyanBox::read() {
-  uint32_t var = this->transprt.read_config32(this->transprt.read_smu(this->arg_addr));
-  return var;
+  return trans->read_smu(arg_addr);
 }
 
-
 uint32_t CyanBox::read_hi() {
-  uint32_t var = this->transprt.read_config32(this->transprt.read_smu(this->arg_addr + 4));
-  return var;
+  return trans->read_smu(arg_addr + 4);
 }
 
 

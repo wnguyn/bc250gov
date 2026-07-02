@@ -10,6 +10,7 @@
 // configuration file
 #include "config.hpp"
 #include "smu/smu.hpp"
+#include "idle/policy.hpp"
 
 
 
@@ -41,27 +42,37 @@ int main(void) {
 
   auto cfg = std::make_unique<Config>();
   auto gpu = std::make_unique<APU>(cfg->safe_pt);
+  smu_init_idle(*gpu);
   
-  while(1) {
-    // check temps before doing anything and get freq domain
-    auto temps = gpu->read_temp();
-    std::tuple<uint32_t, uint32_t> domain_freq = gpu->freq;
-    uint32_t max = std::get<1>(domain_freq);
-    if (temps >= cfg->timing.throt) {
-      std::cout << "your thing is thorttling man.. temp is: " << temps << std::endl;
-      gpu->change_freq(max - cfg->big_step); 
+  bool forced = false;
+  size_t idx = gpu->safe_pts.size() - 1;
+
+  while (1) {
+    auto [load, idlestk] = gpu->poll_and_get_load();
+    uint32_t temp = gpu->read_temp();
+    auto [lo, hi] = cfg->load_target;
+
+    if (!forced && load > hi) {
+      auto& pt = gpu->safe_pts[idx];
+      gpu->smu.force_gfx_vid((uint32_t)pt.volt);
+      gpu->smu.force_gfx_freq(pt.freq);
+      forced = true;
     }
-    /*
-    std::ifstream file("/proc/stat");
-    std::stringstream buf;
-    buf << file.rdbuf();
-    std::string stat_stuff = buf.str();
-    */
 
+    if (forced && idlestk > cfg->timing.idle_thresh) {
+      gpu->smu.unforce_gfx_freq();
+      gpu->smu.unforce_gfx_vid();
+      forced = false;
+    }
 
+    if (temp > 85000) { // we already set smu to max 60 but I don't want to fry my board lol
+      auto& lo_pt = gpu->safe_pts[0];
+      gpu->smu.force_gfx_vid((uint32_t)lo_pt.volt);
+      gpu->smu.force_gfx_freq(lo_pt.freq);
+      forced = true;
+    }
 
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1767)); 
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return 0;
 }

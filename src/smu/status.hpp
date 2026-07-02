@@ -1,6 +1,5 @@
 #include "transport.hpp"
 #include <cstdint>
-#include <tuple>
 
 
 enum SmuStatus {
@@ -17,18 +16,17 @@ enum SmuStatus {
 
 class CyanBox {
   public:
+
     uint32_t addr_cmd;
     uint32_t rsp_cmd;
     uint32_t arg_addr;
     uint32_t timeout;
-    CyanTransport transprt;
+    CyanTransport* trans;
 
-    CyanBox(std::string pci_id, uint32_t cmd_addr, uint32_t rsp_addr, uint32_t arg_addr, uint32_t timeout);
+    CyanBox();
+    CyanBox(CyanTransport* t, uint32_t cmd, uint32_t rsp, uint32_t arg, uint32_t to);
     bool send(uint32_t msg_id, uint32_t arg, uint32_t arg_2);
     uint32_t read();
     uint32_t read_hi();
     SmuStatus wdone();
-
-
-
 };

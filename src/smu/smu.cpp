@@ -62,7 +62,7 @@ std::tuple<uint32_t, uint32_t> APU::poll_and_get_load() {
   if (busyornotidk) 
     this->sample |= 1;
 
-  uint32_t avgload = this->sample / 64.0;
+  uint32_t avgload = __builtin_popcount(this->sample);
   uint32_t len = std::__countr_zero(this->sample);
   std::tuple<uint32_t, uint32_t> turp(avgload, len);
   return turp;
@@ -77,11 +77,11 @@ uint32_t APU::read_temp() {
        sizeof(temp_millidegrees),                                                                                                                                                                                   
        &temp_millidegrees                                                                                                                                                                                           
    );    
-  return ret;
+  return temp_millidegrees;
 };
 bool APU::change_freq(uint32_t arg) {
   auto safe_pt = this->safe_pts[0]; // add logic so that it would pick from closest to thingy functionally latelrkajwkefhasjkdfh
-  this->smu.force_gfx_vid(safe_pt.volt);
+  this->smu.force_gfx_vid((uint32_t)safe_pt.volt);
   this->smu.force_gfx_freq(safe_pt.freq);
   return true;
 };
